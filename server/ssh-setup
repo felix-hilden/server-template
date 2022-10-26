@@ -1,0 +1,33 @@
+#!/bin/bash
+
+if [[ $# -ne 2 ]]; then
+    echo "Expected args: USER, DOMAIN"
+    echo "  for user name and server domain name."
+    exit 1
+fi
+
+set -e  # abort script on failure
+
+FOLDER=~/.ssh/keys
+mkdir -p "$FOLDER"
+FILE="$FOLDER/$1-$2"
+
+echo -e "\nGenerating SSH key..."
+ssh-keygen -t ed25519 -f "$FILE"
+echo "Setting appropriate key file permissions... (sudo will ask for privileges)"
+sudo chmod 600 "$FILE"
+sudo chmod 600 "$FILE.pub"
+
+echo -e "\nSending SSH key to server..."
+ssh-copy-id -i "$FILE.pub" "$1@$2"
+
+echo -e "\nWriting local SSH configuration..."
+{
+echo "Host $2";
+echo "  HostName $2";
+echo "  User $1";
+echo "  IdentityFile $FILE";
+echo "  IdentitiesOnly yes";
+} >> ~/.ssh/config
+
+echo -e "\nSSH setup complete!"

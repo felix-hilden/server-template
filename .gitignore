@@ -1,0 +1,8 @@
+# generated files
+certbot
+options-ssl-nginx.conf
+ssl-dhparams.pem
+
+# python
+__pycache__/
+*.py[cod]

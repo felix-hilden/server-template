@@ -1,0 +1,6 @@
+version: "3"
+
+services:
+  website:
+    volumes:
+      - ./website/nginx/cert/:/etc/nginx/conf.d/:ro

@@ -1,0 +1,30 @@
+# Only listen on 22
+Port 22
+
+# Disable unwanted login methods
+PermitRootLogin no
+PasswordAuthentication no
+PermitEmptyPasswords no
+HostbasedAuthentication no
+ChallengeResponseAuthentication no
+UsePAM no
+IgnoreRhosts yes
+
+# Only allow publickey authentication
+AuthenticationMethods publickey
+PubkeyAuthentication yes
+
+# Optional explicit allowlist of users
+# AllowUsers USER NAMES
+
+# Session options
+X11Forwarding yes
+PrintMotd no
+ClientAliveInterval 300
+ClientAliveCountMax 1
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+# override default of no subsystems
+Subsystem	sftp	/usr/lib/openssh/sftp-server

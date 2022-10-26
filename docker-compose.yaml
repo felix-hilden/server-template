@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+  website:
+    image: nginx:stable
+    volumes:
+      - ./website/site/:/usr/share/nginx/html/:ro
+      - ./website/nginx/include:/etc/nginx/include:ro
+      - ./certbot/www/:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/letsencrypt/:ro
+    ports:
+      - 80:80
+  app:
+    build: ./app
+    volumes:
+      - ./app/src/:/app/src/:ro
+    environment:
+      - PYTHONPATH=src
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload

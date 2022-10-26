@@ -1,0 +1,42 @@
+#!/bin/bash
+
+if [[ $# -ne 1 ]]; then
+    echo "Expected arg: USER"
+    echo "  for user name."
+    exit 1
+fi
+
+set -e  # abort script on failure
+
+echo -e "\nInstalling generic tools..."
+sudo apt install make -y
+
+echo -e "\nConfiguring SSH server..."
+sudo mv sshd_config /etc/ssh/sshd_config
+sudo sshd -t
+sudo systemctl restart ssh
+sudo systemctl status ssh
+
+echo -e "\nSetting up firewall..."
+sudo apt install ufw -y
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 22/tcp comment 'ssh'
+sudo ufw enable
+sudo ufw status numbered
+
+echo -e "\nHardening kernel..."
+sudo mv sysctl.conf /etc/sysctl.conf
+sudo sysctl --system
+
+echo -e "\nInstalling Docker..."
+sudo apt install docker.io docker-compose -y
+sudo usermod -aG docker "$1"
+
+echo -e "\nConfiguring firewall for web server..."
+sudo ufw allow 80 comment 'http'
+sudo ufw allow 443 comment 'https'
+sudo ufw status numbered
+
+echo -e "\nBuild successful! Try running 'docker run hello-world'."
+exec sg docker newgrp $(id -gn)

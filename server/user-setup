@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [[ $# -ne 1 ]]; then
+    echo "Expected arg: USER"
+    echo "  for user name."
+    exit 1
+fi
+
+set -e  # abort script on failure
+
+echo -e "\nUpdating system..."
+apt update
+apt upgrade -y
+apt autoremove
+
+echo -e "\nCreating new sudo user..."
+apt install sudo -y
+adduser "$1"
+usermod -aG sudo "$1"
+echo "Created user with groups:"
+groups "$1"
+
+echo -e "\nUser successfully created!"
